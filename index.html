@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Data Visualization</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>MULTISENSOR SENSOR WATER QUALITY VIEWER</h1>
+    </header>
+    <main>
+        <p>Selecciona la variable de interés</p>
+        
+        <!-- Botones de navegación -->
+        <div class="navigation-buttons">
+            <button onclick="document.getElementById('section-ph').scrollIntoView({ behavior: 'smooth' });">pH</button>
+            <button onclick="document.getElementById('section-od').scrollIntoView({ behavior: 'smooth' });">OD</button>
+            <button onclick="document.getElementById('section-orp').scrollIntoView({ behavior: 'smooth' });">ORP</button>
+            <button onclick="document.getElementById('section-temperatura').scrollIntoView({ behavior: 'smooth' });">Temperatura</button>
+            <button onclick="document.getElementById('section-conductividad').scrollIntoView({ behavior: 'smooth' });">Conductividad</button>
+            <button onclick="document.getElementById('section-turbiedad').scrollIntoView({ behavior: 'smooth' });">Turbiedad</button>
+            <button id="raw-data-button-new" onclick="window.open('https://docs.google.com/spreadsheets/d/1a2avgToqmMTziejnlxSAomqnzypB9XzYNtNijEfGok8/edit?gid=0#gid=0', '_blank')">Ver datos crudos</button>
+        </div>
+        
+        <div id="section-ph" class="variable-section">
+            <h2 class="variable-title">pH</h2>
+            <div id="spreadsheet-data-ph"></div>
+            <div id="load-status-ph">Cargando datos...</div> <!-- Estado de carga -->
+            <h2 class="chart-title">Gráfica de pH</h2>
+            <div id="chart-ph"></div> <!-- Contenedor de la gráfica de pH -->
+        </div>
+        
+        <div id="section-od" class="variable-section">
+            <h2 class="variable-title">OD</h2>
+            <div id="spreadsheet-data-od"></div>
+            <div id="load-status-od">Cargando datos...</div> <!-- Estado de carga -->
+            <h2 class="chart-title">Gráfica de OD</h2>
+            <div id="chart-od"></div> <!-- Contenedor de la gráfica de OD -->
+        </div>
+        
+        <div id="section-orp" class="variable-section">
+            <h2 class="variable-title">ORP (Datos no 100% confiables debido al sensor)</h2>
+            <div id="spreadsheet-data-orp"></div>
+            <div id="load-status-orp">Cargando datos...</div> <!-- Estado de carga -->
+            <h2 class="chart-title">Gráfica de ORP</h2>
+            <div id="chart-orp"></div> <!-- Contenedor de la gráfica de ORP -->
+        </div>
+        
+        <div id="section-temperatura" class="variable-section">
+            <h2 class="variable-title">Temperatura</h2>
+            <div id="spreadsheet-data-temperatura"></div>
+            <div id="load-status-temperatura">Cargando datos...</div> <!-- Estado de carga -->
+            <h2 class="chart-title">Gráfica de Temperatura</h2>
+            <div id="chart-temperatura"></div> <!-- Contenedor de la gráfica de Temperatura -->
+        </div>
+        
+        <div id="section-conductividad" class="variable-section">
+            <h2 class="variable-title">Conductividad (Datos no 100% confiables debido al sensor)</h2>
+            <div id="spreadsheet-data-conductividad"></div>
+            <div id="load-status-conductividad">Cargando datos...</div> <!-- Estado de carga -->
+            <h2 class="chart-title">Gráfica de Conductividad</h2>
+            <div id="chart-conductividad"></div> <!-- Contenedor de la gráfica de Conductividad -->
+        </div>
+        
+        <div id="section-turbiedad" class="variable-section">
+            <h2 class="variable-title">Turbiedad</h2>
+            <div id="spreadsheet-data-turbiedad"></div>
+            <div id="load-status-turbiedad">Cargando datos...</div> <!-- Estado de carga -->
+            <h2 class="chart-title">Gráfica de Turbiedad</h2>
+            <div id="chart-turbiedad"></div> <!-- Contenedor de la gráfica de Turbiedad -->
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2025 Multisensor Water Quality Viewer</p>
+    </footer>
+    <script src="scripts/main.js"></script>
+</body>
+</html>
