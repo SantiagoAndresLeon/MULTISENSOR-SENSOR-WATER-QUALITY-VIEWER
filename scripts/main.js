@@ -68,7 +68,33 @@ async function fetchSpreadsheetData(range, elementId, loadStatusId, headers) {
     }
 }
 
-// ...existing code...
+// Función para mostrar el modal con información
+function showInfo(message, title = "Información") {
+    const modal = document.getElementById('info-modal');
+    const modalText = document.getElementById('modal-text');
+    const modalTitle = document.getElementById('modal-title-info');
+
+    // Configurar el título y el texto del modal
+    modalTitle.textContent = title;
+    modalText.textContent = message;
+
+    // Mostrar el modal
+    modal.style.display = 'block';
+}
+
+// Función para cerrar el modal
+function closeModal() {
+    const modal = document.getElementById('info-modal');
+    modal.style.display = 'none';
+}
+
+// Cerrar el modal si el usuario hace clic fuera del contenido
+window.onclick = function (event) {
+    const modal = document.getElementById('info-modal');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+};
 
 function drawChart(data, containerId, color, label) {
     const container = d3.select(`#${containerId}`);
@@ -211,6 +237,73 @@ function drawChart(data, containerId, color, label) {
         }
     }
 }
+
+// Función para mostrar el modal con un gráfico
+function showChartModal(data, title) {
+    const modal = document.getElementById('chart-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const chartContainer = document.getElementById('modal-chart-container');
+
+    // Configurar el título del modal
+    modalTitle.textContent = title;
+
+    // Limpiar cualquier gráfico previo
+    chartContainer.innerHTML = '';
+
+    // Crear el gráfico dentro del modal
+    const width = chartContainer.offsetWidth;
+    const height = 300;
+    const margin = { top: 20, right: 30, bottom: 50, left: 50 };
+
+    const svg = d3.select(chartContainer)
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+    const xScale = d3.scaleTime()
+        .domain(d3.extent(data, d => d.date))
+        .range([margin.left, width - margin.right]);
+
+    const yScale = d3.scaleLinear()
+        .domain([d3.min(data, d => d.value) - 0.5, d3.max(data, d => d.value) + 0.5])
+        .range([height - margin.bottom, margin.top]);
+
+    const line = d3.line()
+        .x(d => xScale(d.date))
+        .y(d => yScale(d.value));
+
+    svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale).ticks(5).tickFormat(d3.timeFormat('%d/%m/%Y')));
+
+    svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+
+    svg.append('path')
+        .datum(data)
+        .attr('fill', 'none')
+        .attr('stroke', 'steelblue')
+        .attr('stroke-width', 2)
+        .attr('d', line);
+
+    // Mostrar el modal
+    modal.style.display = 'block';
+}
+
+// Función para cerrar el modal
+function closeChartModal() {
+    const modal = document.getElementById('chart-modal');
+    modal.style.display = 'none';
+}
+
+// Cerrar el modal si el usuario hace clic fuera del contenido
+window.onclick = function (event) {
+    const modal = document.getElementById('chart-modal');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+};
 
 // Llamar las funciones cuando se cargue la página
 document.addEventListener('DOMContentLoaded', async () => {

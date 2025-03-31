@@ -27,52 +27,77 @@
         
         <div id="section-ph" class="variable-section">
             <h2 class="variable-title">pH</h2>
+            <button onclick="showInfo('En términos del agua, el pH es un indicador clave de su calidad, ya que revela si el agua es ácida, neutra o básica. Un pH cercano a 7 se considera ideal para el agua potable, ya que indica que no es ni demasiado ácida ni demasiado alcalina, lo cual es seguro para el consumo humano y para la vida acuática. Si el pH del agua está muy bajo o muy alto, puede ser señal de contaminación o presencia de sustancias químicas que pueden afectar la salud y el medio ambiente.', 'Información sobre pH')">Más información sobre esta variable</button>
             <div id="spreadsheet-data-ph"></div>
-            <div id="load-status-ph">Cargando datos...</div> <!-- Estado de carga -->
+            <div id="load-status-ph">Cargando datos...</div>
             <h2 class="chart-title">Gráfica de pH</h2>
-            <div id="chart-ph"></div> <!-- Contenedor de la gráfica de pH -->
+            <div id="chart-ph"></div>
         </div>
         
         <div id="section-od" class="variable-section">
             <h2 class="variable-title">OD</h2>
+            <button onclick="showInfo('El oxígeno disuelto (OD) en el agua es la cantidad de oxígeno disponible para los organismos acuáticos, y es un indicador fundamental de la calidad del agua. Un nivel adecuado de oxígeno disuelto es esencial para la vida de peces, plantas y otros seres vivos que habitan en ríos, lagos y otros cuerpos de agua. Cuando el OD es bajo, puede ser señal de contaminación orgánica o estancamiento, lo que genera condiciones peligrosas o incluso mortales para la fauna acuática.', 'Información sobre OD')">Más información sobre esta variable</button>
             <div id="spreadsheet-data-od"></div>
-            <div id="load-status-od">Cargando datos...</div> <!-- Estado de carga -->
+            <div id="load-status-od">Cargando datos...</div>
             <h2 class="chart-title">Gráfica de OD</h2>
-            <div id="chart-od"></div> <!-- Contenedor de la gráfica de OD -->
+            <div id="chart-od"></div>
         </div>
         
         <div id="section-orp" class="variable-section">
             <h2 class="variable-title">ORP (Datos no 100% confiables debido al sensor)</h2>
+            <button onclick="showInfo('El ORP, o Potencial de Oxidación-Reducción, es una medida que indica la capacidad del agua para eliminar contaminantes a través de reacciones químicas. En términos de calidad del agua, un valor de ORP más alto generalmente significa que el agua tiene un mayor poder desinfectante, lo cual es ideal en procesos de purificación, ya que ayuda a eliminar bacterias y otros microorganismos. Por el contrario, valores bajos de ORP pueden indicar la presencia de materia orgánica en descomposición o contaminación.', 'Información sobre ORP')">Más información sobre esta variable</button>
             <div id="spreadsheet-data-orp"></div>
-            <div id="load-status-orp">Cargando datos...</div> <!-- Estado de carga -->
+            <div id="load-status-orp">Cargando datos...</div>
             <h2 class="chart-title">Gráfica de ORP</h2>
-            <div id="chart-orp"></div> <!-- Contenedor de la gráfica de ORP -->
+            <div id="chart-orp"></div>
         </div>
         
         <div id="section-temperatura" class="variable-section">
             <h2 class="variable-title">Temperatura</h2>
+            <button onclick="showInfo('La temperatura del agua es un factor crucial en la evaluación de su calidad, ya que influye directamente en la solubilidad del oxígeno, la actividad de los organismos acuáticos y las reacciones químicas que ocurren en el medio. A temperaturas más altas, el oxígeno se disuelve con menor facilidad, lo que puede afectar negativamente la vida acuática. Además, cambios bruscos o anormales en la temperatura del agua pueden ser indicio de vertimientos industriales, procesos de calentamiento artificial o alteraciones en el ecosistema. ', 'Información sobre Temperatura')">Más información sobre esta variable</button>
             <div id="spreadsheet-data-temperatura"></div>
-            <div id="load-status-temperatura">Cargando datos...</div> <!-- Estado de carga -->
+            <div id="load-status-temperatura">Cargando datos...</div>
             <h2 class="chart-title">Gráfica de Temperatura</h2>
-            <div id="chart-temperatura"></div> <!-- Contenedor de la gráfica de Temperatura -->
+            <div id="chart-temperatura"></div>
         </div>
         
         <div id="section-conductividad" class="variable-section">
             <h2 class="variable-title">Conductividad (Datos no 100% confiables debido al sensor)</h2>
+            <button onclick="showInfo('La conductividad del agua es una medida de su capacidad para conducir electricidad, la cual depende de la cantidad de sales disueltas, como cloruros, sulfatos y otros minerales. En términos de calidad del agua, una conductividad muy alta puede indicar contaminación por aguas residuales, fertilizantes u otras fuentes de carga iónica, mientras que una conductividad muy baja puede reflejar una carencia de minerales esenciales. Este parámetro es muy útil para detectar cambios en la composición química del agua y evaluar si es apta para el consumo humano, el riego o su uso en procesos industriales.', 'Información sobre Conductividad')">Más información sobre esta variable</button>
             <div id="spreadsheet-data-conductividad"></div>
-            <div id="load-status-conductividad">Cargando datos...</div> <!-- Estado de carga -->
+            <div id="load-status-conductividad">Cargando datos...</div>
             <h2 class="chart-title">Gráfica de Conductividad</h2>
-            <div id="chart-conductividad"></div> <!-- Contenedor de la gráfica de Conductividad -->
+            <div id="chart-conductividad"></div>
         </div>
         
         <div id="section-turbiedad" class="variable-section">
             <h2 class="variable-title">Turbiedad</h2>
+            <button onclick="showInfo('La turbiedad del agua se refiere a la cantidad de partículas suspendidas que reducen su claridad, como arcilla, limo, materia orgánica, microorganismos y otros contaminantes. En términos de calidad del agua, una alta turbiedad puede ser señal de contaminación, erosión del suelo o actividad humana cercana, y puede afectar negativamente tanto a la salud humana como a los ecosistemas acuáticos. Además, el agua turbia puede proteger a bacterias y virus de los procesos de desinfección, dificultando su eliminación. ', 'Información sobre Turbiedad')">Más información sobre esta variable</button>
             <div id="spreadsheet-data-turbiedad"></div>
-            <div id="load-status-turbiedad">Cargando datos...</div> <!-- Estado de carga -->
+            <div id="load-status-turbiedad">Cargando datos...</div>
             <h2 class="chart-title">Gráfica de Turbiedad</h2>
-            <div id="chart-turbiedad"></div> <!-- Contenedor de la gráfica de Turbiedad -->
+            <div id="chart-turbiedad"></div>
         </div>
     </main>
+    
+    <!-- Modal reutilizable -->
+    <div id="info-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h3 id="modal-title-info"></h3>
+            <p id="modal-text"></p>
+        </div>
+    </div>
+    
+    <!-- Modal reutilizable -->
+    <div id="chart-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeChartModal()">&times;</span>
+            <h3 id="modal-title"></h3>
+            <div id="modal-chart-container"></div> <!-- Contenedor para el gráfico -->
+        </div>
+    </div>
+    
     <footer>
         <p>&copy; 2025 Multisensor Water Quality Viewer</p>
     </footer>
