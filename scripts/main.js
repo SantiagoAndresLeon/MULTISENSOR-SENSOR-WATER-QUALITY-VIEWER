@@ -1,323 +1,344 @@
-const apiKey = 'AIzaSyCkoK0vUiTppNceyF2sZKsmufLqgPK_AVA'; // Reemplaza con tu clave de API
-const spreadsheetId = '1a2avgToqmMTziejnlxSAomqnzypB9XzYNtNijEfGok8';
-const rangePH = 'pH!A1:Z2001'; // Ajusta el rango según tus necesidades para la hoja pH
-const rangeOD = 'OD!A1:Z2001'; // Ajusta el rango según tus necesidades para la hoja OD
-const rangeORP = 'ORP!A1:Z2001'; // Ajusta el rango según tus necesidades para la hoja ORP
-const rangeTemperatura = 'Temperatura!A1:Z2001'; // Ajusta el rango según tus necesidades para la hoja Temperatura
-const rangeConductividad = 'Conductividad!A1:Z2001'; // Ajusta el rango según tus necesidades para la hoja Conductividad
-const rangeTurbiedad = 'Turbiedad!A1:Z2001'; // Ajusta el rango según tus necesidades para la hoja Turbiedad
+const apiKey = 'AIzaSyCkoK0vUiTppNceyF2sZKsmufLqgPK_AVA'; 
 
-async function fetchSpreadsheetData(range, elementId, loadStatusId, headers) {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
-    const loadStatus = document.getElementById(loadStatusId);
+// ID del primer Spreadsheet (Humedal Entrada)
+const spreadsheetId = '1a2avgToqmMTziejnlxSAomqnzypB9XzYNtNijEfGok8'; 
 
-    try {
-        console.log('Fetching data from URL:', url);
-        const response = await fetch(url);
-        const data = await response.json();
-        console.log('Data fetched:', data);
+// ID del segundo Spreadsheet (Humedal Salida)
+const secondSpreadsheetId = '1RtRAfTI26SKUmhv58u3chuYhqHe_0zCeseYCLEgf_1g';
 
-        const values = data.values;
-        if (!values || values.length <= 1) {
-            document.getElementById(elementId).innerHTML = 'No data found.';
-            loadStatus.innerHTML = 'Datos cargados correctamente.';
-            return [];
-        }
+// HUMEDAL ENTRADA (hoja principal)
+const rangePH            = 'pH!A:B';
+const rangeOD            = 'OD!A:B';
+const rangeORP           = 'ORP!A:B';
+const rangeTemperatura   = 'Temperatura!A:B';
+const rangeConductividad = 'Conductividad!A:B'; // si solo lees la col B
+const rangeTurbiedad     = 'Turbiedad!A:B';
 
-        // Obtener solo los últimos 5 registros
-        const lastFiveValues = values.slice(-5); 
+// HUMEDAL SALIDA (segundo Spreadsheet)
+const rangePH_2            = 'pH!A:B';
+const rangeOD_2            = 'OD!A:B';
+const rangeORP_2           = 'ORP!A:B';
+const rangeTemperatura_2   = 'Temperatura!A:B';
+const rangeConductividad_2 = 'Conductividad!A:B';
+const rangeTurbiedad_2     = 'Turbiedad!A:B';
 
-        // Crear tabla de datos
-        let table = `<table border="1"><tr>${headers.map(header => `<th>${header}</th>`).join('')}</tr>`;
-        lastFiveValues.forEach(row => {
-            table += '<tr>';
-            row.forEach(cell => {
-                table += `<td>${cell}</td>`;
-            });
-            table += '</tr>';
-        });
-        table += '</table>';
-        document.getElementById(elementId).innerHTML = table;
-        loadStatus.innerHTML = 'Datos cargados correctamente.';
-
-        // Convertir los datos para la gráfica
-        return values.slice(1).map(d => {
-            let dateTimeParts = d[0].split(" "); // Separar fecha y hora
-            let dateParts = dateTimeParts[0].split("/"); // Separar día, mes y año
-            let timeParts = dateTimeParts[1].split(":"); // Separar horas, minutos y segundos
-
-            let formattedDate = new Date(
-                dateParts[2],      // Año
-                dateParts[1] - 1,  // Mes (restamos 1 porque en JS los meses van de 0 a 11)
-                dateParts[0],      // Día
-                timeParts[0],      // Hora
-                timeParts[1],      // Minutos
-                timeParts[2]       // Segundos
-            );
-
-            return {
-                date: formattedDate,
-                value: parseFloat(d[1]) // Convertir el valor del sensor a número
-            };
-        });
-
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        loadStatus.innerHTML = 'Error cargando los datos.';
-        return [];
-    }
+async function fetchSheet(range, sheetId = spreadsheetId) {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(range)}?key=${apiKey}`;
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return resp.json();
 }
 
-// Función para mostrar el modal con información
+/**
+ * Carga datos de la hoja principal y opcionalmente de una hoja secundaria.
+ * - Muestra una tabla con: FECHA | SENSOR | (SENSOR 2 opcional)
+ * - Devuelve datos [{date, value}] para graficar a partir de la hoja principal.
+ */
+async function fetchSpreadsheetData(range, elementId, loadStatusId, headers,
+  extraRange = null, extraHeader = null) {
+
+  const loadStatus = document.getElementById(loadStatusId);
+  try {
+    const [resMain, resExtra] = await Promise.allSettled([
+      fetchSheet(range, spreadsheetId),
+      extraRange ? fetchSheet(extraRange, secondSpreadsheetId) : Promise.resolve(null)
+    ]);
+
+    if (resMain.status !== 'fulfilled') {
+      throw new Error(`No se pudo leer la hoja principal: ${resMain.reason}`);
+    }
+    const dataMain = resMain.value;
+    const dataExtra = (resExtra.status === 'fulfilled') ? resExtra.value : null;
+
+    const valuesMain = (dataMain && dataMain.values) ? dataMain.values : [];
+    if (valuesMain.length <= 1) {
+      document.getElementById(elementId).innerHTML = 'No data found.';
+      loadStatus.innerHTML = 'Datos cargados correctamente.';
+      return { main: [], extra: [] };
+    }
+
+    // Últimos 5 registros para la TABLA (alineados por índice, no por fecha)
+    const mainRows = valuesMain.slice(-5);
+    let extraRows = [];
+    if (dataExtra && dataExtra.values && dataExtra.values.length) {
+      extraRows = dataExtra.values.slice(-5);
+    }
+
+    let hdrs = [...headers];
+    if (extraRange && extraHeader) hdrs.push(extraHeader);
+
+    let table = `<table border="1"><tr>${hdrs.map(h => `<th>${h}</th>`).join('')}</tr>`;
+    const maxLen = Math.max(mainRows.length, extraRows.length);
+    for (let i = maxLen - 1; i >= 0; i--) {
+      const rMain = mainRows[i] || [];
+      const fecha = rMain[0] || '';
+      const valMain = rMain[1] || '';
+      let valExtra = '';
+      if (extraRange) {
+        const rExtra = extraRows[i] || [];
+        valExtra = (rExtra[1] !== undefined) ? rExtra[1] : '';
+      }
+      table += `<tr><td>${fecha}</td><td>${valMain}</td>${extraRange ? `<td>${valExtra}</td>` : ''}</tr>`;
+    }
+    table += '</table>';
+    document.getElementById(elementId).innerHTML = table;
+    loadStatus.innerHTML = 'Datos cargados correctamente.';
+
+    // Series para GRÁFICA
+    const parseSeries = (vals) => vals.slice(1).map(d => {
+      const [dateStr, timeStr] = String(d[0] || '').split(' ');
+      const [dd, mm, yyyy] = (dateStr || '').split('/').map(Number);
+      const [HH = 0, MM = 0, SS = 0] = (timeStr || '00:00:00').split(':').map(Number);
+      const dt = new Date(yyyy, (mm || 1) - 1, dd || 1, HH, MM, SS);
+      return { date: dt, value: parseFloat(d[1]) };
+    }).filter(x => !Number.isNaN(x.value));
+
+    const seriesMain = parseSeries(valuesMain);
+    const seriesExtra = (dataExtra && dataExtra.values) ? parseSeries(dataExtra.values) : [];
+
+    return { main: seriesMain, extra: seriesExtra };
+
+  } catch (err) {
+    console.error('Error fetching data:', err);
+    loadStatus.innerHTML = 'Error cargando los datos.';
+    return { main: [], extra: [] };
+  }
+}
+
+// --------- Modales de info ---------
 function showInfo(message, title = "Información") {
-    const modal = document.getElementById('info-modal');
-    const modalText = document.getElementById('modal-text');
-    const modalTitle = document.getElementById('modal-title-info');
-
-    // Configurar el título y el texto del modal
-    modalTitle.textContent = title;
-    modalText.textContent = message;
-
-    // Mostrar el modal
-    modal.style.display = 'block';
+  const modal = document.getElementById('info-modal');
+  document.getElementById('modal-title-info').textContent = title;
+  document.getElementById('modal-text').textContent = message;
+  modal.style.display = 'block';
 }
-
-// Función para cerrar el modal
 function closeModal() {
-    const modal = document.getElementById('info-modal');
-    modal.style.display = 'none';
+  document.getElementById('info-modal').style.display = 'none';
 }
+window.addEventListener('click', (e) => {
+  const modal = document.getElementById('info-modal');
+  if (e.target === modal) modal.style.display = 'none';
+});
 
-// Cerrar el modal si el usuario hace clic fuera del contenido
-window.onclick = function (event) {
-    const modal = document.getElementById('info-modal');
-    if (event.target === modal) {
-        modal.style.display = 'none';
-    }
-};
+// --------- Gráficas ---------
+function drawChartTwoSeries(mainData, extraData, containerId, opts) {
+  const { mainColor = 'steelblue', mainLabel = 'Serie 1',
+          extraColor = 'limegreen', extraLabel = 'Serie 2' } = opts || {};
 
-function drawChart(data, containerId, color, label) {
-    const container = d3.select(`#${containerId}`);
-    if (!container.node()) {
-        console.error(`Error: Contenedor del gráfico ${containerId} no encontrado.`);
-        return;
-    }
-    const containerWidth = container.node().getBoundingClientRect().width; // Obtener ancho del contenedor
-    const width = containerWidth - 50; // Ajustar tamaño con margen
-    const height = 400;
-    const margin = { top: 50, right: 50, bottom: 80, left: 60 };
+  const container = d3.select(`#${containerId}`);
+  if (!container.node() || !mainData || mainData.length === 0) return;
 
-    // Limpiar gráfico anterior si existe
-    container.selectAll("*").remove();
+  const containerWidth = container.node().getBoundingClientRect().width;
+  const width = Math.max(300, containerWidth - 50);
+  const height = 400;
+  const margin = { top: 50, right: 60, bottom: 80, left: 60 };
 
-    const svg = container.append("svg")
-        .attr("viewBox", `0 0 ${width + margin.left + margin.right}, ${height + margin.top + margin.bottom}`)
-        .attr("preserveAspectRatio", "xMinYMin meet") // Hacer responsivo
-        .append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
+  container.selectAll('*').remove();
 
-    // Escala del eje X (TIEMPO)
-    const xScale = d3.scaleTime()
-        .domain(d3.extent(data, d => d.date))
-        .range([0, width]); // Rango de 0 al ancho de la escala
+  const svg = container.append('svg')
+    .attr('viewBox', `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+    .attr('preserveAspectRatio', 'xMinYMin meet')
+    .append('g')
+    .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // Escala del eje Y (VALORES DEL SENSOR)
-    const yScale = d3.scaleLinear()
-        .domain([
-            d3.min(data, d => d.value) - 0.5,
-            d3.max(data, d => d.value) + 0.5
-        ])
-        .range([height, 0]);
+  const allData = extraData && extraData.length ? mainData.concat(extraData) : mainData;
 
-    // Eje X (Fechas)
-    svg.append("g")
-        .attr("transform", `translate(0,${height})`)
-        .call(d3.axisBottom(xScale).ticks(5).tickFormat(d3.timeFormat("%d/%m/%Y %H:%M:%S")))
-        .selectAll("text")
-        .attr("transform", "rotate(-30)")
-        .style("text-anchor", "end")
-        .style("font-size", "12px");
+  const xScale = d3.scaleTime()
+    .domain(d3.extent(allData, d => d.date))
+    .range([0, width]);
 
-    // Eje Y (Valores)
-    svg.append("g").call(d3.axisLeft(yScale));
+  const yScale = d3.scaleLinear()
+    .domain([
+      d3.min(allData, d => d.value) - 0.5,
+      d3.max(allData, d => d.value) + 0.5
+    ])
+    .nice()
+    .range([height, 0]);
 
-    // Línea de datos
-    const line = d3.line()
-        .x(d => xScale(d.date))
-        .y(d => yScale(d.value));
+  // Ejes
+  svg.append('g')
+    .attr('transform', `translate(0,${height})`)
+    .call(d3.axisBottom(xScale).ticks(5).tickFormat(d3.timeFormat('%d/%m/%Y %H:%M:%S')))
+    .selectAll('text')
+    .attr('transform', 'rotate(-30)')
+    .style('text-anchor', 'end')
+    .style('font-size', '12px');
 
-    svg.append("path")
-        .datum(data)
-        .attr("fill", "none")
-        .attr("stroke", color)
-        .attr("stroke-width", 2)
-        .attr("d", line);
+  svg.append('g').call(d3.axisLeft(yScale));
 
-    // Último dato registrado
-    const lastDataPoint = data[data.length - 1];
-    const formattedDate = d3.timeFormat("%d/%m/%Y %H:%M:%S")(lastDataPoint.date);
+  // Generador de línea
+  const line = d3.line().x(d => xScale(d.date)).y(d => yScale(d.value));
 
-    svg.append("circle")
-        .attr("cx", xScale(lastDataPoint.date))
-        .attr("cy", yScale(lastDataPoint.value))
-        .attr("r", 6)
-        .attr("fill", "red");
+  // Serie principal
+  svg.append('path')
+    .datum(mainData)
+    .attr('fill', 'none')
+    .attr('stroke', mainColor)
+    .attr('stroke-width', 2)
+    .attr('d', line);
 
-    let labelX = xScale(lastDataPoint.date) + 10;
-    if (labelX + 150 > width) {
-        labelX -= 160;
-    }
-
-    svg.append("text")
-        .attr("x", labelX)
-        .attr("y", yScale(lastDataPoint.value) - 10)
-        .html(`<tspan fill="red">${lastDataPoint.value.toFixed(2)}</tspan> - ${formattedDate}`)
-        .attr("font-size", "14px")
-        .attr("font-weight", "bold");
-
-    // Agregar leyenda
-    const legend = svg.append("g")
-        .attr("transform", `translate(${width - 150}, ${margin.top})`);
-
-    legend.append("rect")
-        .attr("x", -640)
-        .attr("y", -90)
-        .attr("width", 10)
-        .attr("height", 10)
-        .attr("fill", color);
-
-    legend.append("text")
-        .attr("x", -625)
-        .attr("y", -85)
-        .text(label)
-        .attr("font-size", "12px")
-        .attr("alignment-baseline", "middle");
-
-    // Agregar interactividad
-    const focus = svg.append("g")
-        .attr("class", "focus")
-        .style("display", "none");
-
-    focus.append("circle")
-        .attr("r", 5)
-        .attr("fill", "black");
-
-    focus.append("text")
-        .attr("x", 10)
-        .attr("y", -10);
-
-    svg.append("rect")
-        .attr("class", "overlay")
-        .attr("width", width)
-        .attr("height", height)
-        .style("fill", "none")
-        .style("pointer-events", "all")
-        .on("mouseover", () => focus.style("display", null))
-        .on("mouseout", () => focus.style("display", "none"))
-        .on("mousemove", mousemove);
-
-    function mousemove(event) {
-        const bisectDate = d3.bisector(d => d.date).left;
-        const x0 = xScale.invert(d3.pointer(event)[0]);
-        const i = bisectDate(data, x0, 1);
-        const d0 = data[i - 1];
-        const d1 = data[i];
-        const d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-        focus.attr("transform", `translate(${xScale(d.date)},${yScale(d.value)})`);
-        
-        const text = focus.select("text");
-        text.text(`${d3.timeFormat("%d/%m/%Y %H:%M:%S")(d.date)}: ${d.value.toFixed(2)}`);
-        
-        // Ajustar la posición del texto si se sale del borde derecho
-        const textWidth = text.node().getBBox().width;
-        if (xScale(d.date) + textWidth + 15 > width) {
-            text.attr("x", -textWidth - 10);
-        } else {
-            text.attr("x", 10);
-        }
-    }
-}
-
-// Función para mostrar el modal con un gráfico
-function showChartModal(data, title) {
-    const modal = document.getElementById('chart-modal');
-    const modalTitle = document.getElementById('modal-title');
-    const chartContainer = document.getElementById('modal-chart-container');
-
-    // Configurar el título del modal
-    modalTitle.textContent = title;
-
-    // Limpiar cualquier gráfico previo
-    chartContainer.innerHTML = '';
-
-    // Crear el gráfico dentro del modal
-    const width = chartContainer.offsetWidth;
-    const height = 300;
-    const margin = { top: 20, right: 30, bottom: 50, left: 50 };
-
-    const svg = d3.select(chartContainer)
-        .append('svg')
-        .attr('width', width)
-        .attr('height', height);
-
-    const xScale = d3.scaleTime()
-        .domain(d3.extent(data, d => d.date))
-        .range([margin.left, width - margin.right]);
-
-    const yScale = d3.scaleLinear()
-        .domain([d3.min(data, d => d.value) - 0.5, d3.max(data, d => d.value) + 0.5])
-        .range([height - margin.bottom, margin.top]);
-
-    const line = d3.line()
-        .x(d => xScale(d.date))
-        .y(d => yScale(d.value));
-
-    svg.append('g')
-        .attr('transform', `translate(0,${height - margin.bottom})`)
-        .call(d3.axisBottom(xScale).ticks(5).tickFormat(d3.timeFormat('%d/%m/%Y')));
-
-    svg.append('g')
-        .attr('transform', `translate(${margin.left},0)`)
-        .call(d3.axisLeft(yScale));
-
+  // Serie extra (si existe)
+  const hasExtra = extraData && extraData.length;
+  if (hasExtra) {
     svg.append('path')
-        .datum(data)
-        .attr('fill', 'none')
-        .attr('stroke', 'steelblue')
-        .attr('stroke-width', 2)
-        .attr('d', line);
+      .datum(extraData)
+      .attr('fill', 'none')
+      .attr('stroke', extraColor)
+      .attr('stroke-width', 3) // un poco más gruesa para distinguir
+      .attr('d', line);
+  }
 
-    // Mostrar el modal
-    modal.style.display = 'block';
+  // Último punto de la principal
+  const last = mainData[mainData.length - 1];
+  if (last) {
+    svg.append('circle')
+      .attr('cx', xScale(last.date))
+      .attr('cy', yScale(last.value))
+      .attr('r', 6)
+      .attr('fill', 'red');
+
+    const formattedDate = d3.timeFormat('%d/%m/%Y %H:%M:%S')(last.date);
+    let labelX = xScale(last.date) + 10;
+    if (labelX + 150 > width) labelX -= 160;
+
+    svg.append('text')
+      .attr('x', labelX)
+      .attr('y', yScale(last.value) - 10)
+      .html(`<tspan fill="red">${last.value.toFixed(2)}</tspan> - ${formattedDate}`)
+      .attr('font-size', '14px')
+      .attr('font-weight', 'bold');
+  }
+  
+  // --- Último punto de la SERIE EXTRA (Hoja 2) ---
+if (hasExtra && extraData.length) {
+  const last2 = extraData[extraData.length - 1];
+  // Punto final (usa el color de la serie extra)
+  svg.append('circle')
+    .attr('cx', xScale(last2.date))
+    .attr('cy', yScale(last2.value))
+    .attr('r', 6)
+    .attr('fill', 'red');
+
+  const formattedDate2 = d3.timeFormat('%d/%m/%Y %H:%M:%S')(last2.date);
+  let labelX2 = xScale(last2.date) + 10;
+  if (labelX2 + 150 > width) labelX2 -= 160;
+
+  svg.append('text')
+    .attr('x', labelX2)
+    .attr('y', yScale(last2.value) - 10)
+    .html(`<tspan fill="${'red'}">${last2.value.toFixed(2)}</tspan> - ${formattedDate2}`)
+    .attr('font-size', '14px')
+    .attr('font-weight', 'bold');
 }
 
-// Función para cerrar el modal
-function closeChartModal() {
-    const modal = document.getElementById('chart-modal');
-    modal.style.display = 'none';
-}
+  // Leyenda
+  const legend = svg.append('g').attr('transform', `translate(${width - 150}, ${-20})`);
+  legend.append('rect').attr('width', 10).attr('height', 10).attr('fill', mainColor);
+  legend.append('text').attr('x', 15).attr('y', 9).attr('font-size', '12px').text(mainLabel);
 
-// Cerrar el modal si el usuario hace clic fuera del contenido
-window.onclick = function (event) {
-    const modal = document.getElementById('chart-modal');
-    if (event.target === modal) {
-        modal.style.display = 'none';
+  if (hasExtra) {
+    const l2 = svg.append('g').attr('transform', `translate(${width - 150}, ${0})`);
+    l2.append('rect').attr('width', 10).attr('height', 10).attr('fill', extraColor);
+    l2.append('text').attr('x', 15).attr('y', 9).attr('font-size', '12px').text(extraLabel);
+  }
+
+  // -------- Hover para AMBAS series --------
+  const focus1 = svg.append('g').style('display', 'none');
+  focus1.append('circle').attr('r', 5).attr('fill', 'black');
+  const f1txt = focus1.append('text').attr('x', 10).attr('y', -10).attr('font-size', '12px');
+
+  const focus2 = svg.append('g').style('display', hasExtra ? null : 'none');
+  focus2.append('circle').attr('r', 5).attr('fill', 'black');
+  const f2txt = focus2.append('text').attr('x', 10).attr('y', -10).attr('font-size', '12px');
+
+  svg.append('rect')
+    .attr('width', width)
+    .attr('height', height)
+    .style('fill', 'none')
+    .style('pointer-events', 'all')
+    .on('mouseover', () => { focus1.style('display', null); if (hasExtra) focus2.style('display', null); })
+    .on('mouseout',  () => { focus1.style('display', 'none'); if (hasExtra) focus2.style('display', 'none'); })
+    .on('mousemove', mousemove);
+
+  const bisect = d3.bisector(d => d.date).left;
+  const fmt = d3.timeFormat('%d/%m/%Y %H:%M:%S');
+
+  function nearest(dataArr, x0) {
+    let i = bisect(dataArr, x0, 1);
+    if (i >= dataArr.length) i = dataArr.length - 1;
+    const d0 = dataArr[i - 1] || dataArr[0];
+    const d1 = dataArr[i] || dataArr[dataArr.length - 1];
+    return (x0 - d0.date > d1.date - x0) ? d1 : d0;
+  }
+
+  function mousemove(event) {
+    const x0 = xScale.invert(d3.pointer(event)[0]);
+
+    // Serie 1
+    const d1 = nearest(mainData, x0);
+    const x1 = xScale(d1.date), y1 = yScale(d1.value);
+    focus1.attr('transform', `translate(${x1},${y1})`);
+    const t1 = `${fmt(d1.date)}: ${d1.value.toFixed(2)}`;
+    f1txt.text(t1);
+    const b1 = f1txt.node().getBBox();
+    f1txt.attr('x', (x1 + b1.width + 15 > width) ? -b1.width - 10 : 10);
+
+    // Serie 2 (si hay)
+    if (hasExtra) {
+      const d2 = nearest(extraData, x0);
+      const x2 = xScale(d2.date), y2 = yScale(d2.value);
+      focus2.attr('transform', `translate(${x2},${y2})`);
+      const t2 = `${fmt(d2.date)}: ${d2.value.toFixed(2)}`;
+      f2txt.text(t2);
+      const b2 = f2txt.node().getBBox();
+      f2txt.attr('x', (x2 + b2.width + 15 > width) ? -b2.width - 10 : 10);
     }
-};
+  }
+}
 
-// Llamar las funciones cuando se cargue la página
+
+
+// --------- Inicio ---------
 document.addEventListener('DOMContentLoaded', async () => {
-    const dataPH = await fetchSpreadsheetData(rangePH, 'spreadsheet-data-ph', 'load-status-ph', ['FECHA', 'SENSOR']);
-    const dataOD = await fetchSpreadsheetData(rangeOD, 'spreadsheet-data-od', 'load-status-od', ['FECHA', 'Valor (mgO₂/L)']);
-    const dataORP = await fetchSpreadsheetData(rangeORP, 'spreadsheet-data-orp', 'load-status-orp', ['FECHA', 'Valor (Mv)']);
-    const dataTemperatura = await fetchSpreadsheetData(rangeTemperatura, 'spreadsheet-data-temperatura', 'load-status-temperatura', ['FECHA', 'Valor (°C)']);
-    const dataConductividad = await fetchSpreadsheetData(rangeConductividad, 'spreadsheet-data-conductividad', 'load-status-conductividad', ['FECHA', 'Valor (Microsiemens)', 'Valor (Milisimens)']);
-    const dataTurbiedad = await fetchSpreadsheetData(rangeTurbiedad, 'spreadsheet-data-turbiedad', 'load-status-turbiedad', ['FECHA', 'Valor (UNT)']);
-    
-    drawChart(dataPH, 'chart-ph', 'steelblue', 'pH');
-    drawChart(dataOD, 'chart-od', 'orange', 'OD');
-    drawChart(dataORP, 'chart-orp', 'purple', 'ORP');
-    drawChart(dataTemperatura, 'chart-temperatura', 'red', 'Temperatura');
-    drawChart(dataConductividad, 'chart-conductividad', 'green', 'Conductividad');
-    drawChart(dataTurbiedad, 'chart-turbiedad', 'brown', 'Turbiedad');
+  const ph = await fetchSpreadsheetData(
+    rangePH, 'spreadsheet-data-ph', 'load-status-ph',
+    ['FECHA', 'Humedal Entrada'], rangePH_2, 'Humedal Salida'
+  );
+  drawChartTwoSeries(ph.main, ph.extra, 'chart-ph',
+    { mainColor: 'blue', mainLabel: 'Humedal Entrada', extraColor: 'green', extraLabel: 'Humedal Salida' });
+
+  const od = await fetchSpreadsheetData(
+    rangeOD, 'spreadsheet-data-od', 'load-status-od',
+    ['FECHA', 'Valor (mgO₂/L)'], rangeOD_2, 'Valor 2'
+  );
+  drawChartTwoSeries(od.main, od.extra, 'chart-od',
+    { mainColor: 'blue', mainLabel: 'Humedal Entrada', extraColor: 'green', extraLabel: 'Humedal Salida' });
+
+  const orp = await fetchSpreadsheetData(
+    rangeORP, 'spreadsheet-data-orp', 'load-status-orp',
+    ['FECHA', 'Valor (mV)'], rangeORP_2, 'Valor 2'
+  );
+  drawChartTwoSeries(orp.main, orp.extra, 'chart-orp',
+    { mainColor: 'blue', mainLabel: 'Humedal Entrada', extraColor: 'green', extraLabel: 'Humedal Salida' });
+
+  const tmp = await fetchSpreadsheetData(
+    rangeTemperatura, 'spreadsheet-data-temperatura', 'load-status-temperatura',
+    ['FECHA', 'Valor (°C)'], rangeTemperatura_2, 'Valor 2'
+  );
+  drawChartTwoSeries(tmp.main, tmp.extra, 'chart-temperatura',
+    { mainColor: 'blue', mainLabel: 'Humedal Entrada', extraColor: 'green', extraLabel: 'Humedal Salida' });
+
+  const ec = await fetchSpreadsheetData(
+    rangeConductividad, 'spreadsheet-data-conductividad', 'load-status-conductividad',
+    ['FECHA', 'Valor (µS/cm)'], rangeConductividad_2, 'Valor 2'
+  );
+  drawChartTwoSeries(ec.main, ec.extra, 'chart-conductividad',
+    { mainColor: 'blue', mainLabel: 'Humedal Entrada', extraColor: 'green', extraLabel: 'Humedal Salida' });
+
+  const ntu = await fetchSpreadsheetData(
+    rangeTurbiedad, 'spreadsheet-data-turbiedad', 'load-status-turbiedad',
+    ['FECHA', 'Valor (NTU)'], rangeTurbiedad_2, 'Valor 2'
+  );
+  drawChartTwoSeries(ntu.main, ntu.extra, 'chart-turbiedad',
+    { mainColor: 'blue', mainLabel: 'Humedal Entrada', extraColor: 'green', extraLabel: 'Humedal Salida' });
 });
