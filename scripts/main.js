@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const ec = await fetchSpreadsheetData(
     rangeConductividad, 'spreadsheet-data-conductividad', 'load-status-conductividad',
-    ['FECHA', 'Valor (µS/cm)'], rangeConductividad_2, 'Valor 2'
+    ['FECHA', 'Valor (mS/cm)'], rangeConductividad_2, 'Valor 2'
   );
   drawChartTwoSeries(ec.main, ec.extra, 'chart-conductividad',
     { mainColor: 'blue', mainLabel: 'Humedal Entrada', extraColor: 'green', extraLabel: 'Humedal Salida' });
@@ -342,3 +342,4 @@ document.addEventListener('DOMContentLoaded', async () => {
   drawChartTwoSeries(ntu.main, ntu.extra, 'chart-turbiedad',
     { mainColor: 'blue', mainLabel: 'Humedal Entrada', extraColor: 'green', extraLabel: 'Humedal Salida' });
 });
+
