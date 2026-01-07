@@ -309,38 +309,39 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const od = await fetchSpreadsheetData(
     rangeOD, 'spreadsheet-data-od', 'load-status-od',
-    ['FECHA', 'Valor (mgO₂/L)'], rangeOD_2, 'Humedal Salida'
+    ['FECHA', 'Humedal Entrada'], rangeOD_2, 'Humedal Salida'
   );
   drawChartTwoSeries(od.main, od.extra, 'chart-od',
     { mainColor: 'blue', mainLabel: 'Humedal Entrada', extraColor: 'green', extraLabel: 'Humedal Salida' });
 
   const orp = await fetchSpreadsheetData(
     rangeORP, 'spreadsheet-data-orp', 'load-status-orp',
-    ['FECHA', 'Valor (mV)'], rangeORP_2, 'Humedal Salida'
+    ['FECHA', 'Humedal Entrada'], rangeORP_2, 'Humedal Salida'
   );
   drawChartTwoSeries(orp.main, orp.extra, 'chart-orp',
     { mainColor: 'blue', mainLabel: 'Humedal Entrada', extraColor: 'green', extraLabel: 'Humedal Salida' });
 
   const tmp = await fetchSpreadsheetData(
     rangeTemperatura, 'spreadsheet-data-temperatura', 'load-status-temperatura',
-    ['FECHA', 'Valor (°C)'], rangeTemperatura_2, 'Humedal Salida'
+    ['FECHA', 'Humedal Entrada'], rangeTemperatura_2, 'Humedal Salida'
   );
   drawChartTwoSeries(tmp.main, tmp.extra, 'chart-temperatura',
     { mainColor: 'blue', mainLabel: 'Humedal Entrada', extraColor: 'green', extraLabel: 'Humedal Salida' });
 
   const ec = await fetchSpreadsheetData(
     rangeConductividad, 'spreadsheet-data-conductividad', 'load-status-conductividad',
-    ['FECHA', 'Valor (mS/cm)'], rangeConductividad_2, 'Humedal Salida'
+    ['FECHA', 'Humedal Entrada'], rangeConductividad_2, 'Humedal Salida'
   );
   drawChartTwoSeries(ec.main, ec.extra, 'chart-conductividad',
     { mainColor: 'blue', mainLabel: 'Humedal Entrada', extraColor: 'green', extraLabel: 'Humedal Salida' });
 
   const ntu = await fetchSpreadsheetData(
     rangeTurbiedad, 'spreadsheet-data-turbiedad', 'load-status-turbiedad',
-    ['FECHA', 'Valor (NTU)'], rangeTurbiedad_2, 'Humedal Salida'
+    ['FECHA', 'Humedal Entrada'], rangeTurbiedad_2, 'Humedal Salida'
   );
   drawChartTwoSeries(ntu.main, ntu.extra, 'chart-turbiedad',
     { mainColor: 'blue', mainLabel: 'Humedal Entrada', extraColor: 'green', extraLabel: 'Humedal Salida' });
 });
+
 
 
