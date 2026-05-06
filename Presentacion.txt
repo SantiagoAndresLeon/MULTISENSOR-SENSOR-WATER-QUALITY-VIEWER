@@ -45,12 +45,12 @@ Good morning everyone. Today I am here to present our project: "IoT-Based Multip
 2)
 Everyone here understand how monitoring water quality is important to protect both human health and ecosystems. However, there are several challanges these days related with this:
 
-First, they require expensive equipment and must be performed in laboratory settings, which also means that trained personnel are needed to operate them.
+First, they require expensive equipment and must be performed in laboratory settings, which  means that trained personnel are needed to operate them.
 Because of this, measurements are taken infrequently — once or twice a month is common — resulting in discontinuous monitoring where valuable data is lost.
 Furthermore, this lack of continuous data creates a gap in real-time visualization, making it impossible to detect spikes or anomalies at the exact moment they occur.
 Finally, data is often recorded manually, meaning that if no one with the right expertise is available to interpret it, that information can be lost entirely.
 
-These challenges led us to identify this necessities:
+These challenges provides different insights abaout new necessities:
 
 Measurements should be less dependent on specialized personnel.
 Continuous, in-situ, real-time monitoring would significantly improv e data collection.
