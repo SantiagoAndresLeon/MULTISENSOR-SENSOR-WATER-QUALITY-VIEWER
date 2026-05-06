@@ -1,0 +1,87 @@
+1) Hola buen dìa a todos,  el dia de hoy vengo a presentarles mi proyecto "IoT-Based Multiparametric System for Continuous
+Water Quality Monitoring and Web-Based Data Visualization". Esta realizado por Maria Chambueta, Ricardo Gutierrez, Tatiana Chaparro y yo Santiago Leòn.
+
+2)Todos aquì sabemos de la importancia de medir la calidad del agua para salvaguardar vidas y proteger ecosistemas, sin embargo, actualmente existen diversas dificultades al momento de realizar estas mediciones:
+-Primero, estas mediciones requieren de equipo costosos y se realizan en laboratorio. (Wiche means) el requerimiento de personal capacitado para hacer uso de estos
+-Debido a que esto, estas mediciones se realizan de manera no tan frecuente, una o dos veces por mes puede llegar a ser lo usual. Esto ocasiona monitoreos descontinuos en los cuales se pierde inormaciòn
+-Ademàs, debido a esta ausencia de datos hay una brecha en la visualización de datos a tiempo real, y es por ello que no se pueden identificar picos en momentos exactos
+-Por ultimo, el almacenamiento de estos datos suele ser a mano, (wich means that) si no hay una persona capaz de interpretar los datos de los sistemas, esos datos se pueden perder.
+
+Toso este conjunto de problemas nos ha llevado a identificar las siguientes necesidades:
+-Las mediciones deben realizarse con menos dependencia de personal capacitado.
+-El monitoreo continuo insitu en tiempo real mejoraria (would imrpove) la obtencion de datos.
+-Visualizaciòn facil de entender y accesible, sin necesidad de tener los equipos de medicion en la mano.
+-Almacenamiento de datos adecuado, sin necesidad de depender de factores externos.
+
+2)Es por eso, que nos hemos decidido a tener el objetivo de desarrollar Octopus, Un sistema IoT para el monitoreo continuo de la calidad del agua, con visualizacion en tiempo real mediante una interfaz web accesible para computadores y dispossitivos moviles.
+
+3)Para la metodologia,Octopus integra cinco sensores de calidad del agua: temperatura, pH, ORP, conductividad eléctrica (EC) y oxígeno disuelto (DO). Estos sensores se encuentran conectados a un microcontrolador ESP32 con conectividad WiFi, el cual actúa como núcleo del sistema: procesa las
+señales de los sensores y gestiona la transmisión de datos a la red. Todos los sensores fueron calibrados previamente utilizando medidores de referencia de mesa. Para evaluar el desempeño del sistema, se ensamblaron dos unidades Octopus (Unidad A y Unidad B), 
+las cuales fueron instaladas en un sistema externo que recibe agua con características distintas en su entrada y en su salida. La Unidad A fue ubicada en el punto de entrada del sistema, mientras que la Unidad B fue ubicada en el punto de salida.
+
+4)Para la metodologia, en cuestion del software, Las unidades Octopus Unit A y Unit B son conectadas a la misma redWifi del lugar. Una vez los sistemas estan conectados, leen los datos y los almacens en un servidor en la nube, Despues, una pagina web procesa todos estos
+datos y realiza una grafica de los datos de la unit A y de la unit B de cada variable. Ya almacenados en la pagina web, esta recive algunos ajustes para que pueda servir en cualquier tipo de dispositivo digital.
+
+5)Commo resultados, se obtuvo que el sistema capta los datos de la calidad del agua a tiempo real y de manera continua. Como se puede puede ver en la imagen, se muestra la fehca, el valor de entrada y el valor de la salida. Estos datos son recolectados cada 5 minutos y se guardan
+en un datasheet de google automaticamente. Ademàs, para confirmar la eficiencia de los datos, estos son comparados regularmente con los medidores de laboratorio y como respuesta, los datos que brinda OCTOPUS estan bien.
+
+6)Para concluir, este sistema ha estado operando al rededor de 6 meses y en este tiempo, en el laboratorio, ha funcionado correctamente. Con este dispositivo ahora las personas que esten
+interesadas en saber la calidad de su agua, de manera general, pueden entender facilmente sus caracteristicas en tiempo real mediante tambien visualizacion de graficas. A pesar de el funcionamiento correcto, el dispositivo
+depende de estar conectado para funcionar, en una de estas ocaciones se fue la luz dentro del laboratorio y no se obtuvo muestra de datos en este lapso de tiempo.
+
+7)Hablando sobre el futuro de este proyecto, OCTOPUS ha "Landed" aterrizado fuera de entornos de laboratorio. Este sistema se ha implementado en la ficna"Los naranjales" In Ibague-Colombia (far away from the city) donde no hay wifi, esto fue solventado con una simcard con buena red
+de celular, la cual esta vinculada con la ESP32. Para el tema de que depende de la luz, se esta pensando en involucrar paneles solares en este sector. Ya luego, con ayuda de inteligencia artificial, se tiene pensado involucrar un sistema de alarma a y predicciòn de comportamiento de
+los datos del agua, a partir de entrenamientos de machine learning con los datos obtenidos.
+
+8)The authors would like to thank the vice-rectorate for research (IMP ING 4308) of the Universidad Militar Nueva Granada for the financial and institutional support provided for the development of this short communication article. A la familia Torrente por permitirnos trabajar en su huerta,
+y si saben español o estan aprendiendo, les comparto este podcast ya que involucra temas relacionados con agua y ciencia.
+
+
+------------------------ENGLISH---------------------------
+
+1)
+Good morning everyone. Today I am here to present our project: "IoT-Based Multiparametric System for Continuous Water Quality Monitoring and Web-Based Data Visualization." This project was developed by Maria Chambueta, Ricardo Gutierrez, Tatiana Chaparro, and myself, Santiago León.
+
+2)
+Everyone here understand how monitoring water quality is important to protect both human health and ecosystems. However, there are several challanges these days related with this:
+
+First, they require expensive equipment and must be performed in laboratory settings, which also means that trained personnel are needed to operate them.
+Because of this, measurements are taken infrequently — once or twice a month is common — resulting in discontinuous monitoring where valuable data is lost.
+Furthermore, this lack of continuous data creates a gap in real-time visualization, making it impossible to detect spikes or anomalies at the exact moment they occur.
+Finally, data is often recorded manually, meaning that if no one with the right expertise is available to interpret it, that information can be lost entirely.
+
+These challenges led us to identify this necessities:
+
+Measurements should be less dependent on specialized personnel.
+Continuous, in-situ, real-time monitoring would significantly improv e data collection.
+Data visualization should be easy to understand and accessible, without requiring physical access to the measuring equipment.
+Data storage should be reliable and independent of external factors.
+
+3)
+For this reason, our objective was to develop Octopus: an IoT system for continuous water quality monitoring, with real-time visualization through a web interface accessible from both computers and mobile devices.
+
+4) Methodology – Hardware
+Octopus integrates five water quality sensors: temperature, pH, ORP, electrical conductivity (EC), and dissolved oxygen (DO). These sensors are connected to an ESP32 microcontroller with WiFi connectivity, which serves as
+the core of the system — it processes the sensor signals and manages data transmission to the network. All sensors are calibrated using laboratory meters. To evaluate the systems performance, two Octopus 
+units were assembled (Unit A and Unit B) and installed in an external system that receives water with different characteristics at its inlet and outlet. Unit A was placed at the inlet and Unit B at the outlet.
+
+5) Methodology – Software
+Both Octopus units are connected to the same local WiFi network. Once connected, they continuously read sensor data and store it in a cloud server. A web page then processes this data and displays real-time graphs
+for each variable from both Unit A and Unit B. The interface is also adapted to be fully responsive, meaning it works properly on any kind of digital device such as phone or computer.
+
+6) Results
+The system successfully captures water quality data in real time and on and this data are continuous. As shown in the figure, the dashboard displays the date, the inlet value, and the outlet value for each parameter.
+Data is collected every five minutes and automatically saved to a Google Sheet. Additionally, to verify the accuracy of the readings, the data is regularly compared against laboratory instruments, and the results provided by Octopus have shown good agreement.
+
+7) Conclusions 
+The system has been operating for approximately six months and has performed correctly throughout this period in the laboratory environment. With this device, anyone interested in understanding their water quality can easily access
+and interpret real-time data through graphs, without needing specialized knowledge. However, one limitation was identified: the system depends on a continuous power supply. On one occasion, a power outage in the laboratory caused a gap in the data during that period.
+
+8) Future Work
+Octopus has now moved beyond the laboratory. The system has been deployed at "Los Naranjales" farm in Ibagué, Colombia — a rural location far from the city with no WiFi access. This was addressed by using a SIM card with mobile network coverage,
+linked directly to the ESP32. Regarding the power dependency issue, the integration of solar panels is currently being considered for this setting. Also, looking in the future, with the help of artificial intelligence, the team plans to incorporate an alert
+system and predictive modeling, trained using machine learning on the data collected.
+
+9) Acknowledgements
+The authors would like to thank the Vice-Rectorate for Research (IMP ING 4308) of Universidad Militar Nueva Granada for the financial and institutional support provided for the development of this work. We would also like to thank the Torrente family
+for allowing us to work at their farm. And if you speak Spanish or are currently learning it, I'd like to share this podcast with you, as it covers topics related to water and science.
