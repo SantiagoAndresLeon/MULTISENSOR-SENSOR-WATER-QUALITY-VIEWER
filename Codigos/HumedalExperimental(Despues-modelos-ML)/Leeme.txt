@@ -1,0 +1,8 @@
+This code was made for DQO ML codes for DQO. Which means that this code was used after the creation of those codes.
+
+All of the parameters on this code were calibrated. Conductivity is the most relevant for the DQO predictions.
+
+Conductivity in this code:
+Range: 0-20 mS/cm
+K: 0.90
+This sensos has the big size metal electrodes, to catch values of conductivity which are smaller
